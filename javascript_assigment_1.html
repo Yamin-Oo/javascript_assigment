@@ -1,0 +1,17 @@
+<html> 
+  <body> 
+    <ul id="list1"></ul> 
+    <script> 
+      //Add your code here
+      for (let i = 1; i <= 20; i++) {
+        // Skip numbers 5, 10, and 15
+        if (i === 5 || i === 10 || i === 15) {
+          continue;
+        }
+        
+        // Add list item to the unordered list
+        document.getElementById("list1").innerHTML += `<li>${i}</li>`;
+      }
+    </script> 
+  </body> 
+</html> 
