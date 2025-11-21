@@ -1,0 +1,47 @@
+<html>
+  <head>
+    <title>Grade Score - Basic JS example</title>
+    <script>
+      function gradeCalculation() {
+        // Get the score value from input
+        const scoreInput = document.getElementById('score');
+        const score = parseInt(scoreInput.value);
+        const gradeResult = document.getElementById('gradeResult');
+        
+        // Check if score is a valid number between 0-100
+        if (isNaN(score) || score < 0 || score > 100) {
+          gradeResult.textContent = "N/A";
+          return;
+        }
+        
+        // Determine grade based on score
+        if (score >= 80 && score <= 100) {
+          gradeResult.textContent = "A";
+        } else if (score >= 70 && score <= 79) {
+          gradeResult.textContent = "B";
+        } else if (score >= 60 && score <= 69) {
+          gradeResult.textContent = "C";
+        } else if (score >= 50 && score <= 59) {
+          gradeResult.textContent = "D";
+        } else if (score >= 0 && score <= 49) {
+          gradeResult.textContent = "F";
+        } else {
+          gradeResult.textContent = "N/A";
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <h3>Score to Grade</h3>
+    <div>
+      Enter a score
+      <span>
+        <input type="number" id="score" name="score" min="0" max="100"/>
+        <button onclick="gradeCalculation()">Check!</button>
+      </span>
+    </div>
+    <div>
+      Grade: <span id="gradeResult"></span>
+    </div>
+  </body>
+</html>
