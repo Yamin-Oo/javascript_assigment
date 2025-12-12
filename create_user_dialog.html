@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            padding: 30px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px 30px;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .user-table-container {
+            margin-bottom: 30px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #e1e5eb;
+        }
+        
+        .user-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+        
+        .user-table thead {
+            background-color: #f8f9fa;
+        }
+        
+        .user-table th {
+            padding: 16px 20px;
+            text-align: left;
+            font-weight: 600;
+            color: #495057;
+            border-bottom: 2px solid #e1e5eb;
+            font-size: 15px;
+        }
+        
+        .user-table td {
+            padding: 16px 20px;
+            border-bottom: 1px solid #e1e5eb;
+            color: #495057;
+            font-size: 15px;
+        }
+        
+        .user-table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .user-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .add-user-btn {
+            display: block;
+            width: 100%;
+            background: #f8f9fa;
+            border: 2px dashed #ced4da;
+            padding: 18px;
+            font-size: 16px;
+            color: #495057;
+            font-weight: 500;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .add-user-btn:hover {
+            background: #e9ecef;
+            border-color: #adb5bd;
+        }
+        
+        .add-user-btn:active {
+            transform: scale(0.98);
+        }
+        
+        /* Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .modal {
+            background: white;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            animation: modalFadeIn 0.3s ease;
+        }
+        
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .modal-header {
+            padding: 24px 30px 20px;
+            border-bottom: 1px solid #e1e5eb;
+        }
+        
+        .modal-header h2 {
+            font-size: 22px;
+            color: #333;
+            font-weight: 600;
+        }
+        
+        .modal-body {
+            padding: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 22px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #495057;
+            font-size: 15px;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            font-size: 15px;
+            transition: border-color 0.2s ease;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .modal-footer {
+            padding: 20px 30px 30px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            border-top: 1px solid #e1e5eb;
+        }
+        
+        .btn {
+            padding: 11px 24px;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #5a6fd8;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: #6c757d;
+        }
+        
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+        
+        .empty-state h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: #495057;
+        }
+        
+        .empty-state p {
+            margin-bottom: 25px;
+            font-size: 15px;
+        }
+        
+        .btn-empty {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-empty:hover {
+            background: #5a6fd8;
+            transform: translateY(-1px);
+        }
+        
+        .status-message {
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: none;
+        }
+        
+        .status-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #6c757d;
+            cursor: pointer;
+            padding: 5px;
+            line-height: 1;
+        }
+        
+        .close-btn:hover {
+            color: #495057;
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 15px;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .user-table th,
+            .user-table td {
+                padding: 12px 15px;
+            }
+            
+            .modal {
+                margin: 0 15px;
+            }
+            
+            .modal-header,
+            .modal-body,
+            .modal-footer {
+                padding: 20px;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .user-table-container {
+                overflow-x: auto;
+            }
+            
+            .user-table {
+                min-width: 500px;
+            }
+            
+            .modal-footer {
+                flex-direction: column;
+            }
+            
+            .modal-footer .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>User List</h1>
+        </div>
+        
+        <div class="content">
+            <div id="statusMessage" class="status-message"></div>
+            
+            <div class="user-table-container">
+                <table class="user-table">
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Fullname</th>
+                            <th>Email</th>
+                        </tr>
+                    </thead>
+                    <tbody id="userTableBody">
+                        <!-- Users will be loaded here -->
+                        <tr>
+                            <td>abraham</td>
+                            <td>Abraham Linton</td>
+                            <td>abraham@au.edu</td>
+                        </tr>
+                        <tr>
+                            <td>columbus</td>
+                            <td>Christopher Columbus</td>
+                            <td>columbus@au.edu</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <button id="addUserBtn" class="add-user-btn">
+                + New User
+            </button>
+        </div>
+    </div>
+    
+    <!-- Modal Dialog -->
+    <div id="modalOverlay" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>New User</h2>
+                <button class="close-btn" id="closeModalBtn">&times;</button>
+            </div>
+            
+            <div class="modal-body">
+                <form id="addUserForm">
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" class="form-control" placeholder="Enter username" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="fullname">Fullname</label>
+                        <input type="text" id="fullname" class="form-control" placeholder="Enter fullname" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" class="form-control" placeholder="Enter email" required>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="cancelBtn">Cancel</button>
+                <button type="submit" class="btn btn-primary" id="submitBtn">Add User</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Sample initial users
+        let users = [
+            { id: 1, username: "abraham", fullname: "Abraham Linton", email: "abraham@au.edu" },
+            { id: 2, username: "columbus", fullname: "Christopher Columbus", email: "columbus@au.edu" }
+        ];
+        
+        // DOM Elements
+        const userTableBody = document.getElementById('userTableBody');
+        const addUserBtn = document.getElementById('addUserBtn');
+        const modalOverlay = document.getElementById('modalOverlay');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const submitBtn = document.getElementById('submitBtn');
+        const addUserForm = document.getElementById('addUserForm');
+        const usernameInput = document.getElementById('username');
+        const fullnameInput = document.getElementById('fullname');
+        const emailInput = document.getElementById('email');
+        const statusMessage = document.getElementById('statusMessage');
+        
+        // Initialize the dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load users from localStorage or use initial data
+            const savedUsers = localStorage.getItem('users');
+            if (savedUsers) {
+                users = JSON.parse(savedUsers);
+            } else {
+                // Save initial users to localStorage
+                localStorage.setItem('users', JSON.stringify(users));
+            }
+            
+            // Load users into table
+            loadUsers();
+            
+            // Event listeners
+            addUserBtn.addEventListener('click', openModal);
+            closeModalBtn.addEventListener('click', closeModal);
+            cancelBtn.addEventListener('click', closeModal);
+            submitBtn.addEventListener('click', addUser);
+            
+            // Close modal when clicking outside
+            modalOverlay.addEventListener('click', function(e) {
+                if (e.target === modalOverlay) {
+                    closeModal();
+                }
+            });
+            
+            // Close modal with Escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && modalOverlay.style.display === 'flex') {
+                    closeModal();
+                }
+            });
+        });
+        
+        // Load users into the table
+        function loadUsers() {
+            userTableBody.innerHTML = '';
+            
+            if (users.length === 0) {
+                userTableBody.innerHTML = `
+                    <tr>
+                        <td colspan="3">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">👤</div>
+                                <h3>No Users Found</h3>
+                                <p>Start by adding your first user</p>
+                                <button class="btn-empty" onclick="openModal()">Add First User</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            // Add each user to the table
+            users.forEach(user => {
+                const row = document.createElement('tr');
+                
+                row.innerHTML = `
+                    <td>${user.username}</td>
+                    <td>${user.fullname}</td>
+                    <td>${user.email}</td>
+                `;
+                
+                userTableBody.appendChild(row);
+            });
+        }
+        
+        // Open the modal dialog
+        function openModal() {
+            modalOverlay.style.display = 'flex';
+            usernameInput.focus();
+        }
+        
+        // Close the modal dialog
+        function closeModal() {
+            modalOverlay.style.display = 'none';
+            addUserForm.reset();
+        }
+        
+        // Add a new user
+        function addUser() {
+            // Get form values
+            const username = usernameInput.value.trim();
+            const fullname = fullnameInput.value.trim();
+            const email = emailInput.value.trim();
+            
+            // Validate inputs
+            if (!username || !fullname || !email) {
+                showMessage('Please fill in all fields', 'error');
+                return;
+            }
+            
+            if (!isValidEmail(email)) {
+                showMessage('Please enter a valid email address', 'error');
+                return;
+            }
+            
+            // Check if username already exists
+            const usernameExists = users.some(user => user.username.toLowerCase() === username.toLowerCase());
+            if (usernameExists) {
+                showMessage('Username already exists', 'error');
+                return;
+            }
+            
+            // Create new user object
+            const newUser = {
+                id: users.length > 0 ? Math.max(...users.map(u => u.id)) + 1 : 1,
+                username: username,
+                fullname: fullname,
+                email: email
+            };
+            
+            // Add to users array
+            users.push(newUser);
+            
+            // Save to localStorage
+            localStorage.setItem('users', JSON.stringify(users));
+            
+            // Update the table
+            loadUsers();
+            
+            // Close modal and clear form
+            closeModal();
+            
+            // Show success message
+            showMessage('User added successfully!', 'success');
+        }
+        
+        // Show status message
+        function showMessage(text, type) {
+            statusMessage.textContent = text;
+            statusMessage.className = `status-message status-${type}`;
+            statusMessage.style.display = 'block';
+            
+            // Auto-hide after 3 seconds
+            setTimeout(() => {
+                statusMessage.style.display = 'none';
+            }, 3000);
+        }
+        
+        // Validate email format
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+        
+        // Demo function to add sample users
+        window.addSampleUser = function() {
+            const sampleUser = {
+                id: users.length > 0 ? Math.max(...users.map(u => u.id)) + 1 : 1,
+                username: "newuser",
+                fullname: "New User",
+                email: "newuser@example.com"
+            };
+            
+            users.push(sampleUser);
+            localStorage.setItem('users', JSON.stringify(users));
+            loadUsers();
+            showMessage('Sample user added successfully!', 'success');
+        };
+        
+        // Demo function to clear all users
+        window.clearAllUsers = function() {
+            if (confirm('Are you sure you want to clear all users?')) {
+                users = [];
+                localStorage.setItem('users', JSON.stringify(users));
+                loadUsers();
+                showMessage('All users cleared!', 'success');
+            }
+        };
+    </script>
+</body>
+</html>
